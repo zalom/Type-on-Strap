@@ -56,3 +56,13 @@
     text-decoration: none;
   }
 }
+
+.search-highlight {
+  font-weight: 600;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 50%, rgba(255,235,59,0.7) 50%);
+  padding: 0 2px;
+}
+
+[data-theme="dark"] .search-highlight {
+  background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(255,152,0,0.8) 50%);
+}
