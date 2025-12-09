@@ -15,7 +15,7 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 echo "=================================================="
-echo "Simple-Jekyll-Search Validation (v2.0.0)"
+echo "Simple-Jekyll-Search Validation (v2.0.1)"
 echo "=================================================="
 echo ""
 
@@ -32,10 +32,10 @@ VERSION=$(head -3 assets/js/vendor/simple-jekyll-search.min.js | grep -o 'v[0-9]
 
 if [ -n "$VERSION" ]; then
     echo "$VERSION"
-    if [ "$VERSION" = "v2.0.0" ]; then
-        echo -e "${GREEN}✅ Using expected version (v2.0.0)${NC}"
+    if [ "$VERSION" = "v2.0.1" ]; then
+        echo -e "${GREEN}✅ Using expected version (v2.0.1)${NC}"
     else
-        echo -e "${YELLOW}⚠️  Version mismatch - expected v2.0.0, found ${VERSION}${NC}"
+        echo -e "${YELLOW}⚠️  Version mismatch - expected v2.0.1, found ${VERSION}${NC}"
     fi
 else
     echo "Unable to detect version"
