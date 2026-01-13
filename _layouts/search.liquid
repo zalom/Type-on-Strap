@@ -10,22 +10,35 @@ layout: page
 
 <section>
     <script type="text/javascript">
-        SimpleJekyllSearch({
-            searchInput: document.getElementById('search-input'),
-            resultsContainer: document.getElementById('results-container'),
-            json: '{{ "/assets/data/search.liquid" | relative_url }}',
-            searchResultTemplate: '<div class="search-title" data-testid="search-result-item"><a href="{url}" data-testid="search-result-link"><h3>{title}</h3></a><div class="meta">{date} <div class="right"><i class="fas fa-tag"></i> {tags}</div></div><p>{content}</p></div><hr>',
-            noResultsText: '{{ site.data.language.str_no_result_found | default: "No result found" }}',
-            limit: 10,
-            strategy: {
-                type: 'hybrid',
-            },
-            exclude: [],
-            templateMiddleware: window.createHighlightTemplateMiddleware({
-                className: 'search-highlight',
-                maxLength: 100,
-                contextLength: 150
-            })
-        })
+        (function() {
+            var searchInput = document.getElementById('search-input');
+            var resultsContainer = document.getElementById('results-container');
+            
+            var searchInstance = SimpleJekyllSearch({
+                searchInput: searchInput,
+                resultsContainer: resultsContainer,
+                json: '{{ "/assets/data/search.liquid" | relative_url }}',
+                searchResultTemplate: '<div class="search-title" data-testid="search-result-item"><a href="{url}" data-testid="search-result-link"><h3>{title}</h3></a><div class="meta">{date} <div class="right"><i class="fas fa-tag"></i> {tags}</div></div><p>{content}</p></div><hr>',
+                noResultsText: '{{ site.data.language.str_no_result_found | default: "No result found" }}',
+                limit: 10,
+                strategy: {
+                    type: 'hybrid',
+                },
+                exclude: [],
+                templateMiddleware: window.createHighlightTemplateMiddleware({
+                    className: 'search-highlight',
+                    maxLength: 100,
+                    contextLength: 150
+                })
+            });
+
+            // Restore search state when navigating back (bfcache or browser form restoration)
+            window.addEventListener('pageshow', function(event) {
+                var query = searchInput.value;
+                if (query && query.trim().length > 0 && resultsContainer.children.length === 0) {
+                    searchInstance.search(query);
+                }
+            });
+        })();
     </script>
 </section>
