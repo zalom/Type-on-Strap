@@ -129,6 +129,37 @@ test.describe('Search Functionality @desktop', () => {
     await expect(page.locator('body')).toBeVisible();
   });
 
+  test('should restore search results after navigating back', async ({ page }) => {
+    const searchQuery = 'blog';
+
+    await page.goto('/search', { waitUntil: 'networkidle' });
+
+    const searchInput = page.locator('#search-input');
+    const resultsContainer = page.locator('#results-container');
+
+    await expect(searchInput).toBeVisible();
+    await searchInput.fill(searchQuery);
+    await page.waitForTimeout(2000);
+
+    const resultItems = page.locator('[data-testid="search-result-item"]');
+    const initialCount = await resultItems.count();
+    expect(initialCount).toBeGreaterThan(0);
+
+    const resultLinks = page.locator('[data-testid="search-result-link"]');
+    await resultLinks.first().click();
+    await page.waitForLoadState('networkidle');
+    await expect(page).not.toHaveURL(/\/search\/?$/);
+
+    await page.goBack();
+    await page.waitForLoadState('networkidle');
+    await expect(page).toHaveURL(/search/);
+    await expect(searchInput).toHaveValue(searchQuery);
+
+    await page.waitForTimeout(1000);
+    const restoredCount = await resultItems.count();
+    expect(restoredCount).toBeGreaterThan(0);
+  });
+
   test('should show search from navbar', async ({ page, isMobile }) => {
     await page.goto('/');
 
