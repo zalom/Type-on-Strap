@@ -9,11 +9,12 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
 # Version configuration
-KATEX_VERSION="0.16.25"
+KATEX_VERSION="0.16.28"
 
 # Colors for output
 GREEN='\033[0;32m'
 RED='\033[0;31m'
+YELLOW='\033[1;33m'
 NC='\033[0m'
 
 echo "=================================================="
@@ -21,7 +22,7 @@ echo "KaTeX Validation (v${KATEX_VERSION})"
 echo "=================================================="
 echo ""
 
-# Function to validate a file
+# Function to validate a file by SHA256
 validate_file() {
     local name=$1
     local local_file=$2
@@ -49,8 +50,43 @@ validate_file() {
     fi
 }
 
+# Function to validate CSS version string
+validate_css_version() {
+    local scss_file=$1
+    local expected_version=$2
+    
+    echo "Validating KaTeX CSS/SCSS version..."
+    
+    if [ ! -f "$scss_file" ]; then
+        echo -e "${RED}❌ SCSS file not found: ${scss_file}${NC}"
+        return 1
+    fi
+    
+    # Extract version from local SCSS file
+    LOCAL_VERSION=$(grep -o 'content: *"[0-9.]*"' "$scss_file" | grep -o '[0-9.]*' | head -1)
+    
+    # Extract version from CDN CSS
+    CDN_VERSION=$(curl -sL "https://cdn.jsdelivr.net/npm/katex@${expected_version}/dist/katex.css" | grep -o 'content: *"[0-9.]*"' | grep -o '[0-9.]*' | head -1)
+    
+    echo "  Local SCSS version:  $LOCAL_VERSION"
+    echo "  CDN CSS version:     $CDN_VERSION"
+    echo "  Expected version:    $expected_version"
+    
+    if [ "$LOCAL_VERSION" = "$expected_version" ] && [ "$CDN_VERSION" = "$expected_version" ]; then
+        echo -e "  ${GREEN}✅ CSS version matches!${NC}"
+        return 0
+    elif [ "$LOCAL_VERSION" != "$expected_version" ]; then
+        echo -e "  ${RED}❌ Local SCSS version mismatch! Expected ${expected_version}, found ${LOCAL_VERSION}${NC}"
+        return 1
+    else
+        echo -e "  ${YELLOW}⚠️  CDN version mismatch (CDN may have updated)${NC}"
+        return 1
+    fi
+}
+
 FAILED=0
 
+# Validate JavaScript files
 if ! validate_file "KaTeX main library" \
     "assets/js/vendor/katex.min.js" \
     "https://cdn.jsdelivr.net/npm/katex@${KATEX_VERSION}/dist/katex.min.js"; then
@@ -65,7 +101,14 @@ if ! validate_file "KaTeX auto-render" \
 fi
 echo ""
 
-echo "Version in file:"
+# Validate CSS/SCSS version
+if ! validate_css_version "_sass/external/katex/katex.scss" "$KATEX_VERSION"; then
+    ((FAILED++))
+fi
+echo ""
+
+# Show version from JS file
+echo "Version in JS file:"
 head -20 assets/js/vendor/katex.min.js | grep -o 'version:"[^"]*"' | head -1 || echo "  Not found"
 echo ""
 
@@ -76,4 +119,3 @@ else
     echo -e "${RED}❌ KaTeX validation failed!${NC}"
     exit 1
 fi
-

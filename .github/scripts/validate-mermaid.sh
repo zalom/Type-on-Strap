@@ -9,7 +9,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
 # Version configuration
-MERMAID_VERSION="11.12.0"
+MERMAID_VERSION="11.12.2"
 
 # Colors for output
 GREEN='\033[0;32m'
