@@ -3,6 +3,7 @@ layout: post
 title: >
     Blogging with title 
 tags: [Test, Image]
+categories: Tutorial
 ---
 
 # I am a BIG title

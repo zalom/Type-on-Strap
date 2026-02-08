@@ -8,7 +8,7 @@ layout: default
                 <div class="feature-image-padding"></div>
             {% else %}
                 <h1 id="{{ page.title | cgi_escape }}" class="title">{{ page.title }}</h1>
-                {% include blog/post_info.liquid author=page.author date=page.date %}
+                {% include blog/post_info.liquid author=page.author date=page.date last_modified=page.last_modified %}
             {% endif %}
         </div>
     </header>
@@ -22,9 +22,16 @@ layout: default
     <!-- Social media shares -->
     {% include social/share_buttons.liquid %}
 
-    <!-- Tag list -->
-    {% capture tag_list %}{{ page.tags | join: "|" }}{% endcapture %}
-    {% include default/tags_list.liquid tags=tag_list %}
+    <!-- Category and Tag list -->
+    <div class="tag-category-container">
+        <!-- Category list -->
+        {% capture category_list %}{{ page.categories | join: "|" }}{% endcapture %}
+        {% include default/category_list.liquid categories=category_list %}
+
+        <!-- Tag list -->
+        {% capture tag_list %}{{ page.tags | join: "|" }}{% endcapture %}
+        {% include default/tags_list.liquid tags=tag_list %}
+    </div>
 
 </article>
 
